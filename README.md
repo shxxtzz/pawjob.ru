@@ -93,6 +93,19 @@ Everything is stored in `config/pawjob.json` in your game directory: enabled sta
 
 All version numbers live in `gradle.properties`. Bump `minecraft_version`, `yarn_mappings`, `loader_version` and `fabric_api_version` together, using the current numbers from https://fabricmc.net/develop. If you jump to a Minecraft release that renamed rendering or keybinding APIs, the affected imports are `HudRenderCallback`, `DrawContext` and `KeyBinding`.
 
+## If the build fails
+
+The versions in this repo resolve against Fabric's Maven (checked: Minecraft 1.21.1, Yarn `1.21.1+build.3`, Loader `0.16.5`, Fabric API `0.102.0+1.21.1`, Loom `1.7-SNAPSHOT`, Gradle 8.8, Java 21), and the wrapper jar is committed, so `./gradlew build` is a single command. The tree itself was never compiled, so if anything breaks it will be an API name that moved:
+
+- `HudRenderCallback` — the HUD hook. `EVENT` takes `(DrawContext, float)` before 1.20.5 and `(DrawContext, RenderTickCounter)` after; this tree uses the latter.
+- `DrawContext#fill(...)` and `#drawTextWithShadow(TextRenderer, String, int, int, int)`.
+- `KeyBindingHelper#registerKeyBinding(KeyBinding)` and `E`+`InputUtil.Type.KEYSYM`.
+- `ModuleManager` uses `MinecraftClient#currentScreen`, `Window#getHandle()` and `InputUtil#isKeyPressed(long, int)`.
+- `Screen#render`, `#mouseClicked`, `#mouseScrolled`, `#keyPressed`, `#removed`.
+
+Everything else is plain Java, Gson and Fabric Loader.
+
 ## Status
 
 The tree has not been compiled here — this device has no Java toolchain, so the first `./gradlew build` on your machine is the real test. Everything is written against the 1.21.1 Yarn/API surface, and the wrapper jar matches Gradle 8.8.
+

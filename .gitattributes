@@ -1,0 +1,9 @@
+# Keep the wrapper scripts with the line endings Gradle expects.
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+
+# Source files
+*.java text
+*.gradle text
+*.json text
+*.md text
